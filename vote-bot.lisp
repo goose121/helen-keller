@@ -87,12 +87,14 @@ pairs (e.g. Bob#1234) from STR, and find the user ID's of the server
 members with the usernames and discriminators specified in STR. The
 user ID's returned are in no particular order."
   (let* ((username-pairs
-          (with-input-from-string (names str)
+          (delete-duplicates
+           (with-input-from-string (names str)
             (loop
                for name = (read-until #\# names nil)
                for discrim = (read-until #\Newline names nil)
                while (and name discrim)
-               collecting (list name discrim))))
+               collecting (list name discrim)))
+           :test #'equal))
          (members (loop for memb across (lc:members (from-id *vote-guild* :guild))
                      for match = (find-if
                                   (lambda (user)
@@ -146,3 +148,5 @@ with it)."
                                :record (strip-message ballot-record)))
           (reply msg (format nil "Your ballot ID is ~36R" ballot-id)))
       (user-error (err) (reply msg (format nil "Error: ~a" err))))))
+
+(establish-handler :on-message-create 'handle-message)
