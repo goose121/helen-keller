@@ -139,7 +139,8 @@ with it)."
           ;; record
           (awhen (user-ballot-id (lc:author msg))
             (let ((old-ballot (lookup-ballot it)))
-              (erase (from-id (record old-ballot) :message))))
+              (erase (from-id (record old-ballot) :message))
+              (remhash it *ballot-objects*)))
           (setf (gethash (lc:id (lc:author msg)) *user-ballots*) ballot-id)
           (setf (gethash ballot-id *ballot-objects*)
                 (make-instance 'ballot
